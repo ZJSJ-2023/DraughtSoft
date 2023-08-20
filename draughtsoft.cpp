@@ -162,11 +162,12 @@ void DraughtSoft::updateItems(QString jsonStr)
 				pItem->setOnline(obj["state"].toInt());
 				pItem->setSpeed(obj["speed"].toInt());
 
-				QRectF rect = pItem->boundingRect();
+				/*QRectF rect = pItem->boundingRect();
 				int x = i % 5;
-				int y = i / 5;
+				int y = i / 5;*/
 
-				pItem->setPos(x * rect.width() * 1.2, y * rect.height() * 1.2);
+				//pItem->setPos(x * rect.width() * 1.2, y * rect.height() * 1.2);
+				pItem->setPos(obj["x"].toInt(), obj["y"].toInt());
 				pItem->setCacheMode(QGraphicsItem::DeviceCoordinateCache);
 
 				idToItemMap[id] = pItem;

@@ -73,9 +73,12 @@ QPixmap* CustomGraphicPixmapItem::createPixmap(int id, int speed)
 	font.setPointSize(10);
 	painter.setFont(font);
 
+	//QPointF pos = this->pos();
+
 	painter.drawText(0, 0, 32, 16, Qt::AlignLeft, QString("ID:%0").arg(id));
+	//painter.drawText(0, 16, 64, 16, Qt::AlignLeft, QString("(%0, %1)").arg((int)pos.x()).arg((int)pos.y()));
 	painter.drawText(0, 16, 128, 16, Qt::AlignLeft, QString("speed:%0").arg(speed));
-	painter.drawPixmap(QPoint(0, 40), QPixmap(Appsettings::getImgPath() + "location.png"));
+	//painter.drawPixmap(QPoint(0, 40), QPixmap(Appsettings::getImgPath() + "location.png"));
 
 	return pixmap;
 }
