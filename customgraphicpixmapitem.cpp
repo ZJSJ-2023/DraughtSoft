@@ -19,7 +19,8 @@ CustomGraphicPixmapItem::CustomGraphicPixmapItem(QWidget* view, QGraphicsItem* p
 void CustomGraphicPixmapItem::setId(int id)
 {
 	m_id = id;
-	setPixmap(*createPixmap(m_id));
+	m_pixmap = createPixmap(m_id);
+	setPixmap(*m_pixmap);
 }
 
 void CustomGraphicPixmapItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event)
@@ -57,9 +58,9 @@ void CustomGraphicPixmapItem::hoverLeaveEvent(QGraphicsSceneHoverEvent* event)
 
 }
 
-QPixmap* CustomGraphicPixmapItem::createPixmap(int id)
+QPixmap* CustomGraphicPixmapItem::createPixmap(int id, int speed)
 {
-	QPixmap* pixmap = new QPixmap(32,48);
+	QPixmap* pixmap = new QPixmap(128, 72);
 	pixmap->fill(Qt::transparent);
 	QPainter painter(pixmap);
 
@@ -72,8 +73,22 @@ QPixmap* CustomGraphicPixmapItem::createPixmap(int id)
 	font.setPointSize(10);
 	painter.setFont(font);
 
-	painter.drawText(0,0,32,16,Qt::AlignLeft, QString("ID:%0").arg(id));
-	painter.drawPixmap(QPoint(0, 16), QPixmap(Appsettings::getImgPath() + "location.png"));
+	painter.drawText(0, 0, 32, 16, Qt::AlignLeft, QString("ID:%0").arg(id));
+	painter.drawText(0, 16, 128, 16, Qt::AlignLeft, QString("speed:%0").arg(speed));
+	painter.drawPixmap(QPoint(0, 40), QPixmap(Appsettings::getImgPath() + "location.png"));
 
 	return pixmap;
 }
+
+void CustomGraphicPixmapItem::updatePixmap()
+{
+	if (nullptr != m_pixmap)
+	{
+		delete m_pixmap;
+	}
+
+	m_pixmap = createPixmap(m_id, m_speed);
+	setPixmap(*m_pixmap);
+	update();
+}
+

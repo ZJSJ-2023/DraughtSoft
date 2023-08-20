@@ -98,7 +98,7 @@ DraughtSoft::DraughtSoft(QWidget* parent)
 	HttpFunc::request("http://localhost:8080/allInfo", std::bind(&DraughtSoft::updateItems, this, std::placeholders::_1));
 
 	QTimer* pTimer = new QTimer(this);
-	pTimer->setInterval(30 * 1000);
+	pTimer->setInterval(5000);
 	pTimer->start();
 	connect(pTimer, &QTimer::timeout, this, [=]() {
 		HttpFunc::request("http://localhost:8080/allInfo", std::bind(&DraughtSoft::updateItems, this, std::placeholders::_1));
@@ -147,33 +147,41 @@ void DraughtSoft::updateItems(QString jsonStr)
 	{
 		QJsonObject root = QJsonDocument::fromJson(jsonStr.toUtf8().data()).object();
 
-		QJsonArray array = root["FFU array"].toArray();
+		QJsonArray array = root["FFU Array"].toArray();
 
 		for (int i = 0; i < array.size(); ++i)
 		{
 			QJsonObject obj = array[i].toObject();
-
-			CustomGraphicPixmapItem* pItem = new CustomGraphicPixmapItem(this);
-
 			int id = obj["id"].toInt();
-			pItem->setId(id);
-			pItem->setOnline(obj["state"].toInt());
-			pItem->setSpeed(obj["speed"].toInt());
-
-			QRectF rect = pItem->boundingRect();
-			int x = i % 5;
-			int y = i / 5;
-
-			pItem->setPos(x * rect.width() * 1.2, y * rect.height() * 1.2);
-			pItem->setCacheMode(QGraphicsItem::DeviceCoordinateCache);
 
 			// 如果已经存在，那么只是刷新信息，如果不存在，那么加入进去
 			if (!idToItemMap.contains(id))
 			{
+				CustomGraphicPixmapItem* pItem = new CustomGraphicPixmapItem(this);
+				pItem->setId(id);
+				pItem->setOnline(obj["state"].toInt());
+				pItem->setSpeed(obj["speed"].toInt());
+
+				QRectF rect = pItem->boundingRect();
+				int x = i % 5;
+				int y = i / 5;
+
+				pItem->setPos(x * rect.width() * 1.2, y * rect.height() * 1.2);
+				pItem->setCacheMode(QGraphicsItem::DeviceCoordinateCache);
+
 				idToItemMap[id] = pItem;
 				scene->addItem(pItem);
 			}
+			else
+			{
+				CustomGraphicPixmapItem* pItem = idToItemMap[id];
+				pItem->setOnline(obj["state"].toInt());
+				pItem->setSpeed(obj["speed"].toInt());
+				pItem->updatePixmap();
+			}
 		}
+
+		scene->update();
 	}
 
 }
