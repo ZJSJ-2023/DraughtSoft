@@ -10,6 +10,7 @@ CustomGraphicScene::CustomGraphicScene(QObject* parent /*= nullptr*/)
 	pCurrentItem = new QGraphicsRectItem();
 }
 
+#include <QDebug>
 void CustomGraphicScene::mouseMoveEvent(QGraphicsSceneMouseEvent* e)
 {
 	QGraphicsScene::mouseMoveEvent(e);
@@ -36,8 +37,9 @@ void CustomGraphicScene::mousePressEvent(QGraphicsSceneMouseEvent* event)
 	if (!createFence)
 		return;
 
-	if(!startDraw)  // 第一个点未选，选择第一个点
+	if (!startDraw)  // 第一个点未选，选择第一个点
 	{
+		QPointF f = event->scenePos();
 		topLeft = event->scenePos().toPoint();
 		startDraw = true;
 		addItem(pCurrentItem);
@@ -47,8 +49,8 @@ void CustomGraphicScene::mousePressEvent(QGraphicsSceneMouseEvent* event)
 void CustomGraphicScene::DrawRealShape(std::vector<QPointF> vetPt)
 {
 	QRectF rect;
-	rect.setTopLeft(vetPt[0]);
-	rect.setBottomRight(vetPt[1]);
+	rect.setTopLeft(RootItemInstance()->mapFromScene(vetPt[0]).toPoint());
+	rect.setBottomRight(RootItemInstance()->mapFromScene(vetPt[1]).toPoint());
 
 	CustomGraphicRectItem* pItem = new CustomGraphicRectItem(RootItemInstance());
 	pItem->setRect(rect);

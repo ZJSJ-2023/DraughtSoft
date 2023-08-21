@@ -26,6 +26,7 @@ private:
 
 	void postPos();
 
+	void unCheckOhterButton(bool check, QPushButton* me);
 private:
 	Ui::DraughtSoftClass ui;
 	QPointer<CustomGraphicView>  m_pGraphicView;

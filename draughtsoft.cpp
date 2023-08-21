@@ -17,7 +17,6 @@
 #include "httpfunc.h"
 #include <functional>
 #include "appsettings.h"
-#include <QButtonGroup>
 
 DraughtSoft::DraughtSoft(QWidget* parent)
 	: QMainWindow(parent)
@@ -38,22 +37,18 @@ DraughtSoft::DraughtSoft(QWidget* parent)
 	QPushButton* pCreateFenceBtn = UiFactory::createControl<QPushButton>(property.init().setCheckableState(true).setText(tr("Create Fence")), this);
 	QPushButton* pMoveCloudBtn = UiFactory::createControl<QPushButton>(property.init().setCheckableState(true).setText(tr("Move Cloud")), this);
 
-	QButtonGroup* pButtonGroup = new QButtonGroup(this);
-	pButtonGroup->setExclusive(true);
-	pButtonGroup->addButton(pCreateFenceBtn);
-	pButtonGroup->addButton(pMoveCloudBtn);
-
 	toolBar->addWidget(pCreateFenceBtn);
 	toolBar->addWidget(pMoveCloudBtn);
 
-	scene = new CustomGraphicScene(this);
-	scene->setStickyFocus(true);
-
 	m_pixmapItem = new QGraphicsPixmapItem();
-	GlobalInstance::getInstance().setRootItem(m_pixmapItem);
 	m_pixmapItem->setPixmap(QPixmap(Appsettings::getImgPath() + "map.png"));
 	m_pixmapItem->setFlags(QGraphicsItem::ItemIsMovable);
 	m_pixmapItem->setPos(0, 0);
+
+	GlobalInstance::getInstance().setRootItem(m_pixmapItem);
+
+	scene = new CustomGraphicScene(this);
+	scene->setStickyFocus(true);
 	scene->addItem(m_pixmapItem);
 
 	scene->setSceneRect(scene->itemsBoundingRect());
@@ -70,6 +65,7 @@ DraughtSoft::DraughtSoft(QWidget* parent)
 	m_pGraphicView->show();
 
 	connect(pCreateFenceBtn, &QPushButton::toggled, this, [=](bool check) {
+		unCheckOhterButton(check,pCreateFenceBtn);
 
 		scene->setCreateFence(check);
 
@@ -78,6 +74,7 @@ DraughtSoft::DraughtSoft(QWidget* parent)
 	});
 
 	connect(pMoveCloudBtn, &QPushButton::toggled, this, [=](bool check) {
+		unCheckOhterButton(check, pMoveCloudBtn);
 
 		for (auto item : scene->items())
 		{
@@ -203,4 +200,18 @@ void DraughtSoft::postPos()
 	HttpFunc::post("", jsonStr, [=](QString)->void {
 		// do something 
 	});
+}
+
+void DraughtSoft::unCheckOhterButton(bool check, QPushButton* me)
+{
+	if (!check)
+		return;
+	for (QPushButton* pBtn : findChildren<QPushButton*>())
+	{
+		if (pBtn == me)
+			continue;
+		if (!pBtn->isCheckable())
+			continue;
+		pBtn->setChecked(false);
+	}
 }
