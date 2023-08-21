@@ -103,7 +103,7 @@ DraughtSoft::DraughtSoft(QWidget* parent)
 	});
 }
 
-#define TEST
+//#define TEST
 void DraughtSoft::updateItems(QString str)
 {
 	QString jsonStr;
