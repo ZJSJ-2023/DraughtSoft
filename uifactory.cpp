@@ -48,7 +48,7 @@ namespace UiFactory
 		pCombox->setView(pListView);
 		pCombox->setFont(Appsettings::getAppFont());
 		pCombox->setFixedHeight(height);
-		pCombox->setFixedWidth(maxWidth(property.getTexts(), pCombox->font()) + 48);
+		//pCombox->setFixedWidth(maxWidth(property.getTexts(), pCombox->font()) + 48);
 
 		QStringList texts = property.getTexts();
 		QStringList icons = property.getIcons();
@@ -99,6 +99,7 @@ namespace UiFactory
 
 		if (property.getIcon().isEmpty())
 		{
+			//pLabel->setAlignment(property.getAlignment());
 			pLabel->setText(property.getText());
 			pLabel->setFont(Appsettings::getAppFont());
 			pLabel->setFixedHeight(STANDARD_HEIGHT);

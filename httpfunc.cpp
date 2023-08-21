@@ -33,6 +33,9 @@ namespace HttpFunc
 		//httpÇëÇó
 		QNetworkRequest request;
 		QNetworkAccessManager* nam = new QNetworkAccessManager();
+		QObject::connect(nam, &QNetworkAccessManager::finished, [=](QNetworkReply* reply) {
+			callback(reply->readAll());
+		});
 
 		request.setUrl(QUrl(url));
 
@@ -43,10 +46,6 @@ namespace HttpFunc
 		request.setRawHeader("token", token_headerData.toLocal8Bit());
 
 		QNetworkReply* reply = nam->post(request, json.toLocal8Bit());
-
-		QObject::connect(nam, &QNetworkAccessManager::finished, [=]() {
-			callback(reply->readAll());
-		});
 	}
 
 

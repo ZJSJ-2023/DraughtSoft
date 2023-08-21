@@ -44,6 +44,8 @@ public:
 	DefineMacro(ControlPorperty, EnabledState, bool);
 	DefineMacro(ControlPorperty, ReadOnlyState, bool);
 	DefineMacro(ControlPorperty, CheckableState, bool);
+	DefineMacro(ControlPorperty, Alignment, Qt::Alignment);
+
 
 	ControlPorperty& init()
 	{
@@ -64,6 +66,8 @@ public:
 		EnabledState = true;
 		ReadOnlyState = false;
 		CheckableState = false;
+
+		Alignment = Qt::AlignLeft;
 
 		return *this;
 	}
@@ -88,6 +92,8 @@ private:
 	bool               EnabledState;
 	bool               ReadOnlyState;
 	bool               CheckableState;
+
+	Qt::Alignment      Alignment;
 };
 
 namespace UiFactory

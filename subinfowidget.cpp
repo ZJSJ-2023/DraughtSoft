@@ -10,16 +10,13 @@
 SubInfoWidget::SubInfoWidget(QWidget* parent /*= nullptr*/)
 	:QDialog(parent)
 {
-	setWindowFlags(windowFlags() | Qt::FramelessWindowHint);
+	setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
 	//setAutoFillBackground(true);
 
-	QVBoxLayout* pVLayout = new QVBoxLayout(this);
-	pVLayout->setContentsMargins(0, 0, 0, 0);
-	pVLayout->setSpacing(0);
-	QWidget* pWidget = new QWidget(this);
+	setFixedWidth(240);
 
-	QFormLayout* pFormLayout = new QFormLayout(pWidget);
-	pFormLayout->setSpacing(0);
+	QFormLayout* pFormLayout = new QFormLayout(this);
+	//pFormLayout->setLabelAlignment(Qt::AlignRight);
 	ControlPorperty property1, property2;
 
 	pFormLayout->addRow(UiFactory::createControl<QLabel>(property1.init().setText("ID:")),
@@ -39,9 +36,7 @@ SubInfoWidget::SubInfoWidget(QWidget* parent /*= nullptr*/)
 	QPushButton* pLockBtn = UiFactory::createControl<QPushButton>(property2.init().setObjectname("Lock").setText(tr("Close")));
 	pHLayout->addWidget(pOkButton);
 	pHLayout->addWidget(pLockBtn);
-
-	pVLayout->addWidget(pWidget);
-	pVLayout->addLayout(pHLayout);
+	pFormLayout->addRow(pHLayout);
 
 	connect(pOkButton, &QPushButton::clicked, this, [=](bool check) {
 

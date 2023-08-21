@@ -2,6 +2,7 @@
 #include <QPainter>
 #include "createfencedlg.h"
 #include "customgraphicrectitem.h"
+#include "globalinstance.h"
 
 CustomGraphicScene::CustomGraphicScene(QObject* parent /*= nullptr*/)
 	: QGraphicsScene(parent)
@@ -49,7 +50,7 @@ void CustomGraphicScene::DrawRealShape(std::vector<QPointF> vetPt)
 	rect.setTopLeft(vetPt[0]);
 	rect.setBottomRight(vetPt[1]);
 
-	CustomGraphicRectItem* pItem = new CustomGraphicRectItem();
+	CustomGraphicRectItem* pItem = new CustomGraphicRectItem(RootItemInstance());
 	pItem->setRect(rect);
 	pItem->setOpacity(0.5);
 	addItem(pItem);

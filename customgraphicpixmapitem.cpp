@@ -5,14 +5,12 @@
 #include "globalinstance.h"
 #include "appsettings.h"
 
-CustomGraphicPixmapItem::CustomGraphicPixmapItem(QWidget* view, QGraphicsItem* parent /*= nullptr*/)
+CustomGraphicPixmapItem::CustomGraphicPixmapItem(QGraphicsItem* parent /*= nullptr*/)
 	:QGraphicsPixmapItem(parent)
 {
-	//setPixmap(QPixmap("D:/workplace/Github/DraughtSoft/x64/Release/location.png"));
-	//setFlags(ItemIsMovable);
 	setAcceptHoverEvents(true);
 
-	pTipWidget = new SubInfoWidget();
+	pTipWidget = new SubInfoWidget(MainWindowInstance());
 	pTipWidget->hide();
 }
 
@@ -63,6 +61,8 @@ QPixmap* CustomGraphicPixmapItem::createPixmap(int id, int speed)
 	QPixmap* pixmap = new QPixmap(128, 72);
 	pixmap->fill(Qt::transparent);
 	QPainter painter(pixmap);
+	painter.setRenderHint(QPainter::Antialiasing);
+	painter.setRenderHint(QPainter::HighQualityAntialiasing);
 
 	QPen pen;
 	pen.setColor(Qt::red);
@@ -94,4 +94,3 @@ void CustomGraphicPixmapItem::updatePixmap()
 	setPixmap(*m_pixmap);
 	update();
 }
-

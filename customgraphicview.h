@@ -12,6 +12,9 @@ public:
 	void zoomOut();
 	void zoomReset();
 
+protected:
+	void wheelEvent(QWheelEvent* e) override;
+
 private:
 	qreal  m_zoomInValue;
 	qreal  m_zoomOutValue;

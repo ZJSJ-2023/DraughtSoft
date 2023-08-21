@@ -23,6 +23,8 @@ DraughtSoft::DraughtSoft(QWidget* parent)
 {
 	ui.setupUi(this);
 
+	setWindowState(Qt::WindowMaximized);
+
 	GlobalInstance::getInstance().setMainWindow(this);
 
 	QToolBar* toolBar = new QToolBar(this);
@@ -32,28 +34,26 @@ DraughtSoft::DraughtSoft(QWidget* parent)
 	toolBar->setFloatable(false);
 
 	ControlPorperty property;
-	QPushButton* pZoomInBtn = UiFactory::createControl<QPushButton>(property.init().setText(tr("Zoom In")), this);
-	QPushButton* pZoomOutBtn = UiFactory::createControl<QPushButton>(property.init().setText(tr("Zoom Out")), this);
 	QPushButton* pCreateFenceBtn = UiFactory::createControl<QPushButton>(property.init().setCheckableState(true).setText(tr("Create Fence")), this);
 	QPushButton* pMoveCloudBtn = UiFactory::createControl<QPushButton>(property.init().setCheckableState(true).setText(tr("Move Cloud")), this);
 
-	toolBar->addWidget(pZoomInBtn);
-	toolBar->addWidget(pZoomOutBtn);
 	toolBar->addWidget(pCreateFenceBtn);
 	toolBar->addWidget(pMoveCloudBtn);
 
 	scene = new CustomGraphicScene(this);
 	scene->setStickyFocus(true);
 
-	QGraphicsPixmapItem* pixmapItem = new QGraphicsPixmapItem();
-	pixmapItem->setPixmap(QPixmap(Appsettings::getImgPath() + "map.png"));
-	//pixmapItem->setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsMovable);
-	pixmapItem->setPos(0, 0);
-	scene->addItem(pixmapItem);
+	m_pixmapItem = new QGraphicsPixmapItem();
+	GlobalInstance::getInstance().setRootItem(m_pixmapItem);
+	m_pixmapItem->setPixmap(QPixmap(Appsettings::getImgPath() + "map.png"));
+	m_pixmapItem->setFlags(QGraphicsItem::ItemIsMovable);
+	m_pixmapItem->setPos(0, 0);
+	scene->addItem(m_pixmapItem);
 
 	scene->setSceneRect(scene->itemsBoundingRect());
 
 	m_pGraphicView = new CustomGraphicView(this);
+	m_pGraphicView->setViewportUpdateMode(QGraphicsView::SmartViewportUpdate);
 	//m_pGraphicView->setDragMode(QGraphicsView::ScrollHandDrag);
 	m_pGraphicView->setScene(scene);
 	m_pGraphicView->scale(1, 1);
@@ -63,18 +63,13 @@ DraughtSoft::DraughtSoft(QWidget* parent)
 	m_pGraphicView->move(0, 0);
 	m_pGraphicView->show();
 
-	connect(pZoomInBtn, &QPushButton::clicked, this, [=](bool check) {
-		m_pGraphicView->zoomIn();
-	});
-
-	connect(pZoomOutBtn, &QPushButton::clicked, this, [=](bool check) {
-		m_pGraphicView->zoomOut();
-	});
-
 	connect(pCreateFenceBtn, &QPushButton::toggled, this, [=](bool check) {
 		unCheckOhterButton(check, pCreateFenceBtn);
 
 		scene->setCreateFence(check);
+
+		m_pixmapItem->setFlags(check ? (m_pixmapItem->flags() & ~QGraphicsItem::ItemIsMovable)
+							   : (m_pixmapItem->flags() | QGraphicsItem::ItemIsMovable));
 	});
 
 	connect(pMoveCloudBtn, &QPushButton::toggled, this, [=](bool check) {
@@ -88,6 +83,8 @@ DraughtSoft::DraughtSoft(QWidget* parent)
 									 : (pixmapItem->flags() & ~QGraphicsItem::ItemIsMovable));
 		}
 
+		m_pixmapItem->setFlags(check ? (m_pixmapItem->flags() & ~QGraphicsItem::ItemIsMovable)
+							   : (m_pixmapItem->flags() | QGraphicsItem::ItemIsMovable));
 	});
 
 	setCentralWidget(m_pGraphicView);
@@ -122,10 +119,14 @@ void DraughtSoft::unCheckOhterButton(bool check, QPushButton* me)
 	}
 }
 
-void DraughtSoft::updateItems(QString jsonStr)
+//#define TEST
+void DraughtSoft::updateItems(QString str)
 {
+	QString jsonStr;
+
+#ifdef TEST
 	// just for test
-	/*QJsonObject root;
+	QJsonObject root;
 	root.insert("isOK", 1);
 
 	QJsonArray array;
@@ -139,9 +140,12 @@ void DraughtSoft::updateItems(QString jsonStr)
 		array.push_back(ffu);
 	}
 
-	root.insert("FFU array", array);
+	root.insert("FFU Array", array);
 
-	const QString jsonStr = QJsonDocument(root).toJson();*/
+	jsonStr = QJsonDocument(root).toJson();
+#else
+	jsonStr = str;
+#endif
 
 	// 解析
 	{
@@ -157,17 +161,19 @@ void DraughtSoft::updateItems(QString jsonStr)
 			// 如果已经存在，那么只是刷新信息，如果不存在，那么加入进去
 			if (!idToItemMap.contains(id))
 			{
-				CustomGraphicPixmapItem* pItem = new CustomGraphicPixmapItem(this);
+				CustomGraphicPixmapItem* pItem = new CustomGraphicPixmapItem(m_pixmapItem);
 				pItem->setId(id);
 				pItem->setOnline(obj["state"].toInt());
 				pItem->setSpeed(obj["speed"].toInt());
 
-				/*QRectF rect = pItem->boundingRect();
+#ifdef TEST
+				QRectF rect = pItem->boundingRect();
 				int x = i % 5;
-				int y = i / 5;*/
-
-				//pItem->setPos(x * rect.width() * 1.2, y * rect.height() * 1.2);
+				int y = i / 5;
+				pItem->setPos(x * rect.width() * 1.2, y * rect.height() * 1.2);
+#else if
 				pItem->setPos(obj["x"].toInt(), obj["y"].toInt());
+#endif
 				pItem->setCacheMode(QGraphicsItem::DeviceCoordinateCache);
 
 				idToItemMap[id] = pItem;
@@ -184,5 +190,30 @@ void DraughtSoft::updateItems(QString jsonStr)
 
 		scene->update();
 	}
+}
 
+// post pos information to server
+void DraughtSoft::postPos()
+{
+	QJsonObject root;
+
+	QJsonArray array;
+	for (QGraphicsItem* pItem : m_pixmapItem->childItems())
+	{
+		CustomGraphicPixmapItem* pCustomItem = dynamic_cast<CustomGraphicPixmapItem*>(pItem);
+		QJsonObject ffu;
+		ffu.insert("id", pCustomItem->getId());
+		ffu.insert("x", pCustomItem->pos().x());
+		ffu.insert("y", pCustomItem->pos().y());
+
+		array.push_back(ffu);
+	}
+
+	root.insert("FFU Array", array);
+
+	const QString jsonStr = QJsonDocument(root).toJson();
+
+	HttpFunc::post("", jsonStr, [=](QString)->void {
+		// do something 
+	});
 }

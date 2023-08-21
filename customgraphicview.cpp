@@ -1,4 +1,5 @@
 #include "customgraphicview.h"
+#include <QWheelEvent>
 
 CustomGraphicView::CustomGraphicView(QWidget* parent /*= nullptr*/)
 	:QGraphicsView(parent)
@@ -26,4 +27,18 @@ void CustomGraphicView::zoomOut()
 void CustomGraphicView::zoomReset()
 {
 
+}
+
+void CustomGraphicView::wheelEvent(QWheelEvent* e)
+{
+	if (e->modifiers() & Qt::ControlModifier) {
+		if (e->angleDelta().y() > 0)
+			zoomIn();
+		else
+			zoomOut();
+		e->accept();
+	}
+	else {
+		QGraphicsView::wheelEvent(e);
+	}
 }

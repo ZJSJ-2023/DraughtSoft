@@ -12,6 +12,7 @@
 class CustomGraphicView;
 class CustomGraphicPixmapItem;
 class CustomGraphicScene;
+class QGraphicsPixmapItem;
 
 class DraughtSoft : public QMainWindow
 {
@@ -23,11 +24,14 @@ public:
 private:
 	void unCheckOhterButton(bool check, QPushButton* me);
 
-	void updateItems(QString jsonstr);
+	void updateItems(QString str);
+
+	void postPos();
 
 private:
 	Ui::DraughtSoftClass ui;
 	QPointer<CustomGraphicView>  m_pGraphicView;
 	CustomGraphicScene* scene = nullptr;
 	QMap<int, CustomGraphicPixmapItem*> idToItemMap;
+	QGraphicsPixmapItem* m_pixmapItem;
 };

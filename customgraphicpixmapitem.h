@@ -7,10 +7,12 @@ class SubInfoWidget;
 class CustomGraphicPixmapItem : public QGraphicsPixmapItem
 {
 public:
-	CustomGraphicPixmapItem(QWidget* view, QGraphicsItem* parent = nullptr);
+	CustomGraphicPixmapItem(QGraphicsItem* parent = nullptr);
 	~CustomGraphicPixmapItem() {}
 
 	void setId(int id);
+	int getId() const { return m_id; }
+
 	void setOnline(bool b) { m_onLine = b; }
 	void setSpeed(int speed) { m_speed = speed; }
 	void updatePixmap();
