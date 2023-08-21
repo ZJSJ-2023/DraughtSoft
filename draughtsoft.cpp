@@ -17,6 +17,7 @@
 #include "httpfunc.h"
 #include <functional>
 #include "appsettings.h"
+#include <QButtonGroup>
 
 DraughtSoft::DraughtSoft(QWidget* parent)
 	: QMainWindow(parent)
@@ -36,6 +37,11 @@ DraughtSoft::DraughtSoft(QWidget* parent)
 	ControlPorperty property;
 	QPushButton* pCreateFenceBtn = UiFactory::createControl<QPushButton>(property.init().setCheckableState(true).setText(tr("Create Fence")), this);
 	QPushButton* pMoveCloudBtn = UiFactory::createControl<QPushButton>(property.init().setCheckableState(true).setText(tr("Move Cloud")), this);
+
+	QButtonGroup* pButtonGroup = new QButtonGroup(this);
+	pButtonGroup->setExclusive(true);
+	pButtonGroup->addButton(pCreateFenceBtn);
+	pButtonGroup->addButton(pMoveCloudBtn);
 
 	toolBar->addWidget(pCreateFenceBtn);
 	toolBar->addWidget(pMoveCloudBtn);
@@ -64,7 +70,6 @@ DraughtSoft::DraughtSoft(QWidget* parent)
 	m_pGraphicView->show();
 
 	connect(pCreateFenceBtn, &QPushButton::toggled, this, [=](bool check) {
-		unCheckOhterButton(check, pCreateFenceBtn);
 
 		scene->setCreateFence(check);
 
@@ -73,7 +78,6 @@ DraughtSoft::DraughtSoft(QWidget* parent)
 	});
 
 	connect(pMoveCloudBtn, &QPushButton::toggled, this, [=](bool check) {
-		unCheckOhterButton(check, pMoveCloudBtn);
 
 		for (auto item : scene->items())
 		{
@@ -100,23 +104,6 @@ DraughtSoft::DraughtSoft(QWidget* parent)
 	connect(pTimer, &QTimer::timeout, this, [=]() {
 		HttpFunc::request("http://localhost:8080/allInfo", std::bind(&DraughtSoft::updateItems, this, std::placeholders::_1));
 	});
-}
-
-void DraughtSoft::unCheckOhterButton(bool check, QPushButton* me)
-{
-	if (!check)
-		return;
-
-	for (QPushButton* pBtn : findChildren<QPushButton*>())
-	{
-		if (pBtn == me)
-			continue;
-
-		if (!pBtn->isCheckable())
-			continue;
-
-		pBtn->setChecked(false);
-	}
 }
 
 //#define TEST

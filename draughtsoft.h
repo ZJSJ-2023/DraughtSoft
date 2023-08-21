@@ -22,8 +22,6 @@ public:
 	DraughtSoft(QWidget* parent = Q_NULLPTR);
 
 private:
-	void unCheckOhterButton(bool check, QPushButton* me);
-
 	void updateItems(QString str);
 
 	void postPos();
