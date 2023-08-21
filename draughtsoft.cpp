@@ -42,7 +42,7 @@ DraughtSoft::DraughtSoft(QWidget* parent)
 
 	m_pixmapItem = new QGraphicsPixmapItem();
 	m_pixmapItem->setPixmap(QPixmap(Appsettings::getImgPath() + "map.png"));
-	m_pixmapItem->setFlags(QGraphicsItem::ItemIsMovable);
+	//m_pixmapItem->setFlags(QGraphicsItem::ItemIsMovable);  // if set,the pixmap item can't double clicked
 	m_pixmapItem->setPos(0, 0);
 
 	GlobalInstance::getInstance().setRootItem(m_pixmapItem);
@@ -103,7 +103,7 @@ DraughtSoft::DraughtSoft(QWidget* parent)
 	});
 }
 
-//#define TEST
+#define TEST
 void DraughtSoft::updateItems(QString str)
 {
 	QString jsonStr;
@@ -145,7 +145,7 @@ void DraughtSoft::updateItems(QString str)
 			// 如果已经存在，那么只是刷新信息，如果不存在，那么加入进去
 			if (!idToItemMap.contains(id))
 			{
-				CustomGraphicPixmapItem* pItem = new CustomGraphicPixmapItem(m_pixmapItem);
+				CustomGraphicPixmapItem* pItem = new CustomGraphicPixmapItem();
 				pItem->setId(id);
 				pItem->setOnline(obj["state"].toInt());
 				pItem->setSpeed(obj["speed"].toInt());
