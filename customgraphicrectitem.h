@@ -4,9 +4,13 @@ class CustomGraphicRectItem : public QGraphicsRectItem
 {
 public:
 	CustomGraphicRectItem(QGraphicsItem* parent = nullptr);
-	~CustomGraphicRectItem(){}
+	~CustomGraphicRectItem() {}
 
 	void setBaseInfo(const QString& name, const QString& type, int color);
+
+	QString getName() const { return m_name; }
+	QString getType() const { return m_type; }
+	int    getColor() const { return m_color; }
 
 protected:
 	void hoverEnterEvent(QGraphicsSceneHoverEvent* event) override;

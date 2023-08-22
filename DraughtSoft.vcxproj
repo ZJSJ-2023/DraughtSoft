@@ -92,6 +92,7 @@
     <ClCompile Include="customgraphicview.cpp" />
     <ClCompile Include="globalinstance.cpp" />
     <ClCompile Include="httpfunc.cpp" />
+    <ClCompile Include="itemmanager.cpp" />
     <ClCompile Include="subinfowidget.cpp" />
     <ClCompile Include="uifactory.cpp" />
     <QtRcc Include="draughtsoft.qrc" />
@@ -115,6 +116,7 @@
     <QtMoc Include="subinfowidget.h" />
     <ClInclude Include="globalinstance.h" />
     <ClInclude Include="httpfunc.h" />
+    <ClInclude Include="itemmanager.h" />
     <ClInclude Include="uifactory.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

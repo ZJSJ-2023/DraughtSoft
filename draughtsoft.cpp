@@ -17,6 +17,8 @@
 #include "httpfunc.h"
 #include <functional>
 #include "appsettings.h"
+#include "CustomGraphicRectItem.h"
+#include "itemmanager.h"
 
 DraughtSoft::DraughtSoft(QWidget* parent)
 	: QMainWindow(parent)
@@ -65,7 +67,7 @@ DraughtSoft::DraughtSoft(QWidget* parent)
 	m_pGraphicView->show();
 
 	connect(pCreateFenceBtn, &QPushButton::toggled, this, [=](bool check) {
-		unCheckOhterButton(check,pCreateFenceBtn);
+		unCheckOhterButton(check, pCreateFenceBtn);
 
 		scene->setCreateFence(check);
 
@@ -84,8 +86,12 @@ DraughtSoft::DraughtSoft(QWidget* parent)
 									 : (pixmapItem->flags() & ~QGraphicsItem::ItemIsMovable));
 		}
 
-		m_pixmapItem->setFlags(check ? (m_pixmapItem->flags() & ~QGraphicsItem::ItemIsMovable)
-							   : (m_pixmapItem->flags() | QGraphicsItem::ItemIsMovable));
+		/*m_pixmapItem->setFlags(check ? (m_pixmapItem->flags() & ~QGraphicsItem::ItemIsMovable)
+							   : (m_pixmapItem->flags() | QGraphicsItem::ItemIsMovable));*/
+
+							   // post pos when pos locked
+		if (!check)
+			postFFu();
 	});
 
 	setCentralWidget(m_pGraphicView);
@@ -103,7 +109,12 @@ DraughtSoft::DraughtSoft(QWidget* parent)
 	});
 }
 
-//#define TEST
+DraughtSoft::~DraughtSoft()
+{
+	postFences();
+}
+
+#define TEST
 void DraughtSoft::updateItems(QString str)
 {
 	QString jsonStr;
@@ -131,53 +142,14 @@ void DraughtSoft::updateItems(QString str)
 	jsonStr = str;
 #endif
 
-	// 解析
-	{
-		QJsonObject root = QJsonDocument::fromJson(jsonStr.toUtf8().data()).object();
+	parseFFu(jsonStr);
+	parseFence(jsonStr);
 
-		QJsonArray array = root["FFU Array"].toArray();
-
-		for (int i = 0; i < array.size(); ++i)
-		{
-			QJsonObject obj = array[i].toObject();
-			int id = obj["id"].toInt();
-
-			// 如果已经存在，那么只是刷新信息，如果不存在，那么加入进去
-			if (!idToItemMap.contains(id))
-			{
-				CustomGraphicPixmapItem* pItem = new CustomGraphicPixmapItem();
-				pItem->setId(id);
-				pItem->setOnline(obj["state"].toInt());
-				pItem->setSpeed(obj["speed"].toInt());
-
-#ifdef TEST
-				QRectF rect = pItem->boundingRect();
-				int x = i % 5;
-				int y = i / 5;
-				pItem->setPos(x * rect.width() * 1.2, y * rect.height() * 1.2);
-#else if
-				pItem->setPos(obj["x"].toInt(), obj["y"].toInt());
-#endif
-				pItem->setCacheMode(QGraphicsItem::DeviceCoordinateCache);
-
-				idToItemMap[id] = pItem;
-				scene->addItem(pItem);
-			}
-			else
-			{
-				CustomGraphicPixmapItem* pItem = idToItemMap[id];
-				pItem->setOnline(obj["state"].toInt());
-				pItem->setSpeed(obj["speed"].toInt());
-				pItem->updatePixmap();
-			}
-		}
-
-		scene->update();
-	}
+	scene->update();
 }
 
 // post pos information to server
-void DraughtSoft::postPos()
+void DraughtSoft::postFFu()
 {
 	QJsonObject root;
 
@@ -185,6 +157,9 @@ void DraughtSoft::postPos()
 	for (QGraphicsItem* pItem : m_pixmapItem->childItems())
 	{
 		CustomGraphicPixmapItem* pCustomItem = dynamic_cast<CustomGraphicPixmapItem*>(pItem);
+		if (!pCustomItem)
+			continue;
+
 		QJsonObject ffu;
 		ffu.insert("id", pCustomItem->getId());
 		ffu.insert("x", pCustomItem->pos().x());
@@ -200,6 +175,126 @@ void DraughtSoft::postPos()
 	HttpFunc::post("", jsonStr, [=](QString)->void {
 		// do something 
 	});
+}
+
+void DraughtSoft::postFences()
+{
+	QJsonObject root;
+
+	QJsonArray array;
+	for (QGraphicsItem* pItem : m_pixmapItem->childItems())
+	{
+		CustomGraphicRectItem* pCustomItem = dynamic_cast<CustomGraphicRectItem*>(pItem);
+		if (!pCustomItem)
+			continue;
+
+		QJsonObject fence;
+		fence.insert("name", pCustomItem->getName());
+		fence.insert("type", pCustomItem->getType());
+		fence.insert("color", pCustomItem->getColor());
+
+		QRectF rect = pCustomItem->rect();
+
+		fence.insert("x", rect.x());
+		fence.insert("y", rect.y());
+		fence.insert("width", rect.width());
+		fence.insert("height", rect.height());
+
+		array.push_back(fence);
+	}
+
+	root.insert("Fence Array", array);
+
+	const QString jsonStr = QJsonDocument(root).toJson();
+
+	HttpFunc::post("", jsonStr, [=](QString)->void {
+		// do something 
+	});
+}
+
+void DraughtSoft::parseFFu(const QString& str)
+{
+	QJsonObject root = QJsonDocument::fromJson(str.toUtf8().data()).object();
+
+	QJsonArray array = root["FFU Array"].toArray();
+	if (array.isEmpty())
+		return;
+
+	for (int i = 0; i < array.size(); ++i)
+	{
+		QJsonObject obj = array[i].toObject();
+		int id = obj["id"].toInt();
+
+		// 如果已经存在，那么只是刷新信息，如果不存在，那么加入进去
+		CustomGraphicPixmapItem* pItem = nullptr;
+		if (!ItemManagerInstance()->containsFFu(id))
+		{
+			pItem = new CustomGraphicPixmapItem(m_pixmapItem);
+			pItem->setId(id);
+			//pItem->update();
+
+#ifdef TEST
+			QRectF rect = pItem->boundingRect();
+			int x = i % 5;
+			int y = i / 5;
+			pItem->setPos(x * rect.width() * 1.2, y * rect.height() * 1.2);
+#else if
+			pItem->setPos(obj["x"].toInt(), obj["y"].toInt());
+#endif
+			pItem->setCacheMode(QGraphicsItem::DeviceCoordinateCache);
+
+			ItemManagerInstance()->addFFu(id, pItem);
+			scene->addItem(pItem);
+		}
+		else
+			pItem = ItemManagerInstance()->getFFu(id);
+
+		if (pItem)
+		{
+			pItem->setOnline(obj["state"].toInt());
+			pItem->setSpeed(obj["speed"].toInt());
+			pItem->update();
+		}
+	}
+}
+
+void DraughtSoft::parseFence(const QString& str)
+{
+	QJsonObject root = QJsonDocument::fromJson(str.toUtf8().data()).object();
+
+	QJsonArray array = root["Fence Array"].toArray();
+	if (array.isEmpty())
+		return;
+
+	for (int i = 0; i < array.size(); ++i)
+	{
+		QJsonObject obj = array[i].toObject();
+		QString name = obj["name"].toString();
+		QString type = obj["type"].toString();
+		int color = obj["color"].toInt();
+
+		// 如果已经存在，那么只是刷新信息，如果不存在，那么加入进去
+		CustomGraphicRectItem* pItem = nullptr;
+		if (!ItemManagerInstance()->containseFence(name))
+		{
+			pItem = new CustomGraphicRectItem(m_pixmapItem);
+			pItem->setOpacity(0.5);
+
+			pItem->setPos(obj["x"].toInt(), obj["y"].toInt());
+			pItem->setRect(obj["x"].toInt(), obj["y"].toInt(), obj["width"].toInt(), obj["height"].toInt());
+			pItem->setCacheMode(QGraphicsItem::DeviceCoordinateCache);
+
+			ItemManagerInstance()->addFence(name, pItem);
+			scene->addItem(pItem);
+		}
+		else
+			pItem = ItemManagerInstance()->getFence(name);
+
+		if (pItem)
+		{
+			pItem->setBaseInfo(name, type, color);
+		}
+	}
 }
 
 void DraughtSoft::unCheckOhterButton(bool check, QPushButton* me)

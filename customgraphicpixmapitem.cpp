@@ -17,8 +17,6 @@ CustomGraphicPixmapItem::CustomGraphicPixmapItem(QGraphicsItem* parent /*= nullp
 void CustomGraphicPixmapItem::setId(int id)
 {
 	m_id = id;
-	m_pixmap = createPixmap(m_id);
-	setPixmap(*m_pixmap);
 }
 
 void CustomGraphicPixmapItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event)
@@ -83,14 +81,16 @@ QPixmap* CustomGraphicPixmapItem::createPixmap(int id, int speed)
 	return pixmap;
 }
 
-void CustomGraphicPixmapItem::updatePixmap()
+void CustomGraphicPixmapItem::update()
 {
-	if (nullptr != m_pixmap)
+	if (m_pixmap)
 	{
 		delete m_pixmap;
+		m_pixmap = nullptr;
 	}
 
 	m_pixmap = createPixmap(m_id, m_speed);
 	setPixmap(*m_pixmap);
-	update();
+
+	QGraphicsPixmapItem::update();
 }

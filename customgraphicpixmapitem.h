@@ -15,7 +15,7 @@ public:
 
 	void setOnline(bool b) { m_onLine = b; }
 	void setSpeed(int speed) { m_speed = speed; }
-	void updatePixmap();
+	void update();
 
 protected:
 	void mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event) override;

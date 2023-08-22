@@ -20,17 +20,21 @@ class DraughtSoft : public QMainWindow
 
 public:
 	DraughtSoft(QWidget* parent = Q_NULLPTR);
+	~DraughtSoft();
 
 private:
 	void updateItems(QString str);
 
-	void postPos();
+	void postFFu();
+	void postFences();
+
+	void parseFFu(const QString& str);
+	void parseFence(const QString& str);
 
 	void unCheckOhterButton(bool check, QPushButton* me);
 private:
 	Ui::DraughtSoftClass ui;
 	QPointer<CustomGraphicView>  m_pGraphicView;
 	CustomGraphicScene* scene = nullptr;
-	QMap<int, CustomGraphicPixmapItem*> idToItemMap;
 	QGraphicsPixmapItem* m_pixmapItem;
 };
