@@ -19,6 +19,7 @@
 #include "appsettings.h"
 #include "CustomGraphicRectItem.h"
 #include "itemmanager.h"
+#include <QDebug>
 
 DraughtSoft::DraughtSoft(QWidget* parent)
 	: QMainWindow(parent)
@@ -99,14 +100,18 @@ DraughtSoft::DraughtSoft(QWidget* parent)
 	//updateItems("");
 
 	// 第一次请求，初始化数据
-	HttpFunc::request("http://localhost:8080/allInfo", std::bind(&DraughtSoft::updateItems, this, std::placeholders::_1));
+	HttpFunc::request("http://localhost:8080/allInfo", std::bind(&DraughtSoft::updateItems, this, std::placeholders::_1, std::placeholders::_2));
 
 	QTimer* pTimer = new QTimer(this);
 	pTimer->setInterval(5000);
 	pTimer->start();
 	connect(pTimer, &QTimer::timeout, this, [=]() {
-		HttpFunc::request("http://localhost:8080/allInfo", std::bind(&DraughtSoft::updateItems, this, std::placeholders::_1));
+		HttpFunc::request("http://localhost:8080/allInfo", std::bind(&DraughtSoft::updateItems, this, std::placeholders::_1, std::placeholders::_2));
 	});
+
+	// 实时订阅tag位置信息
+	m_pWebSocket = new CustomWebSocket(scene, m_pixmapItem);
+	m_pWebSocket->startToConnect();
 }
 
 DraughtSoft::~DraughtSoft()
@@ -115,8 +120,14 @@ DraughtSoft::~DraughtSoft()
 }
 
 #define TEST
-void DraughtSoft::updateItems(QString str)
+void DraughtSoft::updateItems(int error, const QString& str)
 {
+	if (error != 0)
+	{
+		qDebug() << "Network Error!";
+		return;
+	}
+
 	QString jsonStr;
 
 #ifdef TEST
@@ -146,7 +157,7 @@ void DraughtSoft::updateItems(QString str)
 	parseFence(jsonStr);
 
 	scene->update();
-}
+	}
 
 // post pos information to server
 void DraughtSoft::postFFu()
@@ -172,7 +183,7 @@ void DraughtSoft::postFFu()
 
 	const QString jsonStr = QJsonDocument(root).toJson();
 
-	HttpFunc::post("", jsonStr, [=](QString)->void {
+	HttpFunc::post("", jsonStr, [=](int error, const QString& str)->void {
 		// do something 
 	});
 }
@@ -207,7 +218,7 @@ void DraughtSoft::postFences()
 
 	const QString jsonStr = QJsonDocument(root).toJson();
 
-	HttpFunc::post("", jsonStr, [=](QString)->void {
+	HttpFunc::post("", jsonStr, [=](int error, const QString& str)->void {
 		// do something 
 	});
 }

@@ -46,7 +46,7 @@ SubInfoWidget::SubInfoWidget(QWidget* parent /*= nullptr*/)
 			// 发送命令给风机，并且设置为不可编辑
 			pRotateSpinBox->setEnabled(false);
 
-			HttpFunc::request(QString("http://localhost:8080/set?id=%0&n=%1").arg(getId()).arg(getSpeed()), [](QString str)->void {
+			HttpFunc::request(QString("http://localhost:8080/set?id=%0&n=%1").arg(getId()).arg(getSpeed()), [](int error,const QString& str)->void {
 				// do something or not do at all
 			});
 		}

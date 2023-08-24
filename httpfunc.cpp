@@ -8,13 +8,13 @@
 
 namespace HttpFunc
 {
-	void request(QString url, std::function<void(QString)> callback)
+	void request(QString url, std::function<void(int, const QString&)> callback)
 	{
 		//httpÇëÇó
 		QNetworkRequest request;
 		QNetworkAccessManager* nam = new QNetworkAccessManager();
 		QObject::connect(nam, &QNetworkAccessManager::finished, [=](QNetworkReply* reply) {
-			callback(reply->readAll());
+			callback(reply->error(), reply->readAll());
 		});
 
 		request.setUrl(QUrl(url));
@@ -28,13 +28,13 @@ namespace HttpFunc
 		nam->get(request);
 	}
 
-	void post(QString url, QString json, std::function<void(QString)> callback)
+	void post(QString url, QString json, std::function<void(int, const QString&)> callback)
 	{
 		//httpÇëÇó
 		QNetworkRequest request;
 		QNetworkAccessManager* nam = new QNetworkAccessManager();
 		QObject::connect(nam, &QNetworkAccessManager::finished, [=](QNetworkReply* reply) {
-			callback(reply->readAll());
+			callback(reply->error(), reply->readAll());
 		});
 
 		request.setUrl(QUrl(url));

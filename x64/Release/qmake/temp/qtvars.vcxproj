@@ -34,7 +34,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">
     <ClCompile>
-      <AdditionalIncludeDirectories>D:\workplace\Github\DraughtSoft\DraughtSoft\x64\Release\qmake\temp;D:\software\qt\5.15.2\msvc2019_64\include;D:\software\qt\5.15.2\msvc2019_64\include\QtWidgets;D:\software\qt\5.15.2\msvc2019_64\include\QtGui;D:\software\qt\5.15.2\msvc2019_64\include\QtANGLE;D:\software\qt\5.15.2\msvc2019_64\include\QtNetwork;D:\software\qt\5.15.2\msvc2019_64\include\QtCore;D:\workplace\Github\DraughtSoft\DraughtSoft\x64\Release\qmake\temp;/include;D:\software\qt\5.15.2\msvc2019_64\mkspecs\win32-msvc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\workplace\Github\DraughtSoft\DraughtSoft\x64\Release\qmake\temp;D:\software\qt\5.15.2\msvc2019_64\include;D:\software\qt\5.15.2\msvc2019_64\include\QtWidgets;D:\software\qt\5.15.2\msvc2019_64\include\QtGui;D:\software\qt\5.15.2\msvc2019_64\include\QtANGLE;D:\software\qt\5.15.2\msvc2019_64\include\QtWebSockets;D:\software\qt\5.15.2\msvc2019_64\include\QtNetwork;D:\software\qt\5.15.2\msvc2019_64\include\QtCore;D:\workplace\Github\DraughtSoft\DraughtSoft\x64\Release\qmake\temp;/include;D:\software\qt\5.15.2\msvc2019_64\mkspecs\win32-msvc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -Zc:referenceBinding -Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
       <AssemblerListingLocation>.\</AssemblerListingLocation>
       <BrowseInformation>false</BrowseInformation>
@@ -42,7 +42,7 @@
       <ExceptionHandling>Sync</ExceptionHandling>
       <ObjectFileName>.\</ObjectFileName>
       <Optimization>MaxSpeed</Optimization>
-      <PreprocessorDefinitions>_WINDOWS;UNICODE;_UNICODE;WIN32;_ENABLE_EXTENDED_ALIGNED_STORAGE;WIN64;NDEBUG;QT_NO_DEBUG;QT_WIDGETS_LIB;QT_GUI_LIB;QT_NETWORK_LIB;QT_CORE_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_WINDOWS;UNICODE;_UNICODE;WIN32;_ENABLE_EXTENDED_ALIGNED_STORAGE;WIN64;NDEBUG;QT_NO_DEBUG;QT_WIDGETS_LIB;QT_GUI_LIB;QT_WEBSOCKETS_LIB;QT_NETWORK_LIB;QT_CORE_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessToFile>false</PreprocessToFile>
       <ProgramDataBaseFileName></ProgramDataBaseFileName>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -51,7 +51,7 @@
       <WarningLevel>TurnOffAllWarnings</WarningLevel>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>D:\software\qt\5.15.2\msvc2019_64\lib\Qt5Widgets.lib;D:\software\qt\5.15.2\msvc2019_64\lib\Qt5Gui.lib;D:\software\qt\5.15.2\msvc2019_64\lib\Qt5Network.lib;D:\software\qt\5.15.2\msvc2019_64\lib\Qt5Core.lib;D:\software\qt\5.15.2\msvc2019_64\lib\qtmain.lib;shell32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>D:\software\qt\5.15.2\msvc2019_64\lib\Qt5Widgets.lib;D:\software\qt\5.15.2\msvc2019_64\lib\Qt5Gui.lib;D:\software\qt\5.15.2\msvc2019_64\lib\Qt5WebSockets.lib;D:\software\qt\5.15.2\msvc2019_64\lib\Qt5Network.lib;D:\software\qt\5.15.2\msvc2019_64\lib\Qt5Core.lib;D:\software\qt\5.15.2\msvc2019_64\lib\qtmain.lib;shell32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>C:\openssl\lib;C:\Utils\my_sql\mysql-5.7.25-winx64\lib;C:\Utils\postgresql\pgsql\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>&quot;/MANIFESTDEPENDENCY:type=&apos;win32&apos; name=&apos;Microsoft.Windows.Common-Controls&apos; version=&apos;6.0.0.0&apos; publicKeyToken=&apos;6595b64144ccf1df&apos; language=&apos;*&apos; processorArchitecture=&apos;*&apos;&quot; %(AdditionalOptions)</AdditionalOptions>
       <DataExecutionPrevention>true</DataExecutionPrevention>
@@ -70,7 +70,7 @@
       <WarningLevel>0</WarningLevel>
     </Midl>
     <ResourceCompile>
-      <PreprocessorDefinitions>_WINDOWS;UNICODE;_UNICODE;WIN32;_ENABLE_EXTENDED_ALIGNED_STORAGE;WIN64;NDEBUG;QT_NO_DEBUG;QT_WIDGETS_LIB;QT_GUI_LIB;QT_NETWORK_LIB;QT_CORE_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_WINDOWS;UNICODE;_UNICODE;WIN32;_ENABLE_EXTENDED_ALIGNED_STORAGE;WIN64;NDEBUG;QT_NO_DEBUG;QT_WIDGETS_LIB;QT_GUI_LIB;QT_WEBSOCKETS_LIB;QT_NETWORK_LIB;QT_CORE_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>

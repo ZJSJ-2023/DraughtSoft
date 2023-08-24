@@ -9,6 +9,8 @@
 #include <QPushButton>
 #include <QMap>
 
+#include "customwebsocket.h"
+
 class CustomGraphicView;
 class CustomGraphicPixmapItem;
 class CustomGraphicScene;
@@ -23,7 +25,7 @@ public:
 	~DraughtSoft();
 
 private:
-	void updateItems(QString str);
+	void updateItems(int error,const QString& str);
 
 	void postFFu();
 	void postFences();
@@ -37,4 +39,6 @@ private:
 	QPointer<CustomGraphicView>  m_pGraphicView;
 	CustomGraphicScene* scene = nullptr;
 	QGraphicsPixmapItem* m_pixmapItem;
+
+	CustomWebSocket* m_pWebSocket = nullptr;
 };
